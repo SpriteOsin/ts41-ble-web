@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TS41 BLE Console (Web Bluetooth)</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 16px; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    button, input, select { font: inherit; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(127,127,127,.35); }
+    button { cursor: pointer; }
+    .pill { padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(127,127,127,.35); }
+    #log { white-space: pre-wrap; border: 1px solid rgba(127,127,127,.35); border-radius: 12px; padding: 12px; height: 48vh; overflow:auto; }
+    .card { border: 1px solid rgba(127,127,127,.35); border-radius: 12px; padding: 12px; margin-top: 12px; }
+    .small { font-size: 12px; opacity: .85; line-height: 1.35; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 10px; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  </style>
+</head>
+
+<body>
+  <h2>TS41 BLE Console (Web Bluetooth)</h2>
+
+  <div class="card small">
+    <div><b>Importante:</b> Web Bluetooth só funciona em navegadores que suportam a API (ex.: Chrome/Edge no desktop/Android). No iOS, normalmente você precisa usar um navegador/app que implemente Web Bluetooth.</div>
+    <div>Abra esta página em <b>HTTPS</b> ou <b>http://localhost</b> (file:// geralmente não funciona para Web Bluetooth).</div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <button id="btnConnect">Conectar</button>
+      <button id="btnDisconnect" disabled>Desconectar</button>
+      <span class="pill" id="status">Desconectado</span>
+      <span class="pill" id="devName">—</span>
+    </div>
+    <div class="small" style="margin-top:8px">
+      Service SPP: <code>0000ABF0-0000-1000-8000-00805F9B34FB</code> / Char: <code>0000ABF1-0000-1000-8000-00805F9B34FB</code><br/>
+      Service PRPH (notify JSON): <code>0000DFF0-0000-1000-8000-00805F9B34FB</code> / Char: <code>0000DFF1-0000-1000-8000-00805F9B34FB</code>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <input id="cmd" style="flex:1; min-width:260px" placeholder="Digite um comando (ex: AT&RA)" />
+      <button id="btnSend" disabled>Enviar</button>
+      <button id="btnClear">Limpar log</button>
+    </div>
+    <div class="small" style="margin-top:8px">
+      A firmware espera comandos no formato <code>AT&...</code> e finaliza com <code>\r\n</code>. Eu adiciono automaticamente se você não digitar.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="grid">
+      <div>
+        <b>Leituras</b><br/>
+        <div class="row" style="margin-top:8px">
+          <button class="qc" data-cmd="AT&RA">AT&RA (Config)</button>
+          <button class="qc" data-cmd="AT&RB">AT&RB (Bateria)</button>
+          <button class="qc" data-cmd="AT&RF">AT&RF (Falhas)</button>
+          <button class="qc" data-cmd="AT&RV">AT&RV (States)</button>
+          <button class="qc" data-cmd="AT&RW">AT&RW (SSID)</button>
+          <button class="qc" data-cmd="AT&RP">AT&RP (Pass)</button>
+        </div>
+      </div>
+
+      <div>
+        <b>Ações</b><br/>
+        <div class="row" style="margin-top:8px">
+          <button class="qc" data-cmd="AT&RX">AT&RX (Flash LEDs)</button>
+          <button class="qc" data-cmd="AT&WE">AT&WE (Salvar config)</button>
+          <button class="qc" data-cmd="AT&WR=9">AT&WR=9 (Reset)</button>
+        </div>
+      </div>
+
+      <div>
+        <b>“Scope” (prints periódicos)</b><br/>
+        <div class="row" style="margin-top:8px">
+          <button class="qc" data-cmd="AT&RS1">AT&RS1 (BOP)</button>
+          <button class="qc" data-cmd="AT&RS2">AT&RS2 (ACC)</button>
+          <button class="qc" data-cmd="AT&RS3">AT&RS3 (GYR)</button>
+          <button class="qc" data-cmd="AT&RS0">AT&RS0 (OFF)</button>
+        </div>
+      </div>
+
+      <div>
+        <b>Modo de operação</b><br/>
+        <div class="row" style="margin-top:8px">
+          <button class="qc" data-cmd="AT&WQ=2">BT (AT&WQ=2)</button>
+          <button class="qc" data-cmd="AT&WQ=1">MQTT (AT&WQ=1)</button>
+          <button class="qc" data-cmd="AT&WQ=0">TCP (AT&WQ=0)</button>
+        </div>
+        <div class="small" style="margin-top:8px">Lembre: depois mude e salve com <code>AT&WE</code> e reinicie (<code>AT&WR=9</code>).</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>Terminal</b>
+    <div id="log"></div>
+  </div>
+
+<script>
+  // UUIDs do seu firmware (main/ble/ble_spp.h e main/ble/ble_prph.h)
+  const SPP_SERVICE = "0000abf0-0000-1000-8000-00805f9b34fb";
+  const SPP_CHAR    = "0000abf1-0000-1000-8000-00805f9b34fb";
+
+  const PRPH_SERVICE = "0000dff0-0000-1000-8000-00805f9b34fb";
+  const PRPH_CHAR    = "0000dff1-0000-1000-8000-00805f9b34fb";
+
+  let device = null;
+  let server = null;
+
+  let sppChar = null;
+  let prphChar = null;
+
+  const $ = (id) => document.getElementById(id);
+  const logBox = $("log");
+
+  function ts() {
+    const d = new Date();
+    return d.toLocaleString();
+  }
+
+  function log(line) {
+    logBox.textContent += `[${ts()}] ${line}\n`;
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  function setStatus(txt) {
+    $("status").textContent = txt;
+  }
+
+  function bytesToHex(u8) {
+    return Array.from(u8).map(b => b.toString(16).padStart(2,"0")).join(" ");
+  }
+
+  function onDisconnect() {
+    setStatus("Desconectado");
+    $("devName").textContent = "—";
+    $("btnConnect").disabled = false;
+    $("btnDisconnect").disabled = true;
+    $("btnSend").disabled = true;
+    sppChar = null;
+    prphChar = null;
+    log("❌ Dispositivo desconectou.");
+  }
+
+  function decodeMaybeText(value) {
+    const u8 = new Uint8Array(value.buffer);
+    // tenta texto; se tiver muitos bytes não-imprimíveis, mostra HEX
+    try {
+      const txt = new TextDecoder("utf-8", { fatal: false }).decode(u8);
+      const printable = txt.replace(/[\r\n\t]/g, "").replace(/[ -~]/g, ""); // remove ASCII imprimível
+      if (printable.length > Math.max(6, txt.length * 0.2)) return { kind:"hex", value: bytesToHex(u8) };
+      return { kind:"text", value: txt };
+    } catch {
+      return { kind:"hex", value: bytesToHex(u8) };
+    }
+  }
+
+  async function connect() {
+    if (!navigator.bluetooth) {
+      alert("Web Bluetooth não está disponível neste navegador.");
+      return;
+    }
+
+    log("🔎 Abrindo seletor BLE…");
+    device = await navigator.bluetooth.requestDevice({
+      filters: [{ services: [SPP_SERVICE] }],
+      optionalServices: [SPP_SERVICE, PRPH_SERVICE],
+    });
+
+    device.addEventListener("gattserverdisconnected", onDisconnect);
+
+    $("devName").textContent = device.name || device.id || "—";
+    setStatus("Conectando…");
+
+    server = await device.gatt.connect();
+    setStatus("Conectado");
+
+    // --- SPP (AT commands) ---
+    const sppSvc = await server.getPrimaryService(SPP_SERVICE);
+    sppChar = await sppSvc.getCharacteristic(SPP_CHAR);
+
+    await sppChar.startNotifications();
+    sppChar.addEventListener("characteristicvaluechanged", (e) => {
+      const d = decodeMaybeText(e.target.value);
+      log(d.kind === "text" ? `SPP RX: ${d.value}` : `SPP RX (HEX): ${d.value}`);
+    });
+
+    log("✅ SPP pronto (AT).");
+
+    // --- PRPH (JSON notify) - tenta, mas se falhar segue só com SPP ---
+    try {
+      const prphSvc = await server.getPrimaryService(PRPH_SERVICE);
+      prphChar = await prphSvc.getCharacteristic(PRPH_CHAR);
+
+      await prphChar.startNotifications();
+      prphChar.addEventListener("characteristicvaluechanged", (e) => {
+        const d = decodeMaybeText(e.target.value);
+        log(d.kind === "text" ? `PRPH RX: ${d.value}` : `PRPH RX (HEX): ${d.value}`);
+      });
+
+      log("✅ PRPH pronto (notify JSON).");
+    } catch (err) {
+      log("⚠️ PRPH não disponível (ou navegador não permitiu). Continuando só com SPP.");
+    }
+
+    $("btnConnect").disabled = true;
+    $("btnDisconnect").disabled = false;
+    $("btnSend").disabled = false;
+  }
+
+  async function disconnect() {
+    if (device && device.gatt && device.gatt.connected) device.gatt.disconnect();
+    // onDisconnect será chamado pelo evento
+  }
+
+  async function sendCommand(cmdRaw) {
+    if (!sppChar) {
+      log("⚠️ Não conectado no SPP.");
+      return;
+    }
+
+    let cmd = (cmdRaw || "").trim();
+    if (!cmd) return;
+
+    // garante CRLF (o parser procura \r\n)
+    if (!cmd.endsWith("\\r\\n")) cmd += "\\r\\n";
+
+    const data = new TextEncoder().encode(cmd);
+
+    try {
+      // writeValue => "with response" (mais compatível)
+      await sppChar.writeValue(data);
+      log(`SPP TX: ${cmd.replace(/\\r\\n$/, "")}`);
+    } catch (err) {
+      log(`❌ Erro ao enviar: ${err}`);
+    }
+  }
+
+  // UI events
+  $("btnConnect").onclick = () => connect().catch(e => log("❌ " + e));
+  $("btnDisconnect").onclick = () => disconnect();
+  $("btnSend").onclick = () => sendCommand($("cmd").value);
+  $("btnClear").onclick = () => { logBox.textContent = ""; };
+
+  $("cmd").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendCommand($("cmd").value);
+  });
+
+  document.querySelectorAll(".qc").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const c = btn.getAttribute("data-cmd");
+      $("cmd").value = c;
+      sendCommand(c);
+    });
+  });
+</script>
+</body>
+</html>
