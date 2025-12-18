@@ -214,8 +214,23 @@
   }
 
   async function disconnect() {
-    if (device && device.gatt && device.gatt.connected) device.gatt.disconnect();
-    // onDisconnect será chamado pelo evento
+    try {
+      // Para notifications antes de desconectar (ajuda alguns stacks a realmente encerrar)
+      if (sppChar) { try { await sppChar.stopNotifications(); } catch (_) {} }
+      if (prphChar) { try { await prphChar.stopNotifications(); } catch (_) {} }
+    } catch (_) {}
+
+    try {
+      if (device && device.gatt && device.gatt.connected) device.gatt.disconnect();
+    } catch (e) {
+      log("⚠️ Erro ao desconectar: " + e);
+    }
+
+    // Fallback visual (alguns navegadores não disparam o evento imediatamente)
+    setStatus("Desconectado");
+    $("btnConnect").disabled = false;
+    $("btnDisconnect").disabled = true;
+    $("btnSend").disabled = true;
   }
 
   async function sendCommand(cmdRaw) {
@@ -227,15 +242,30 @@
     let cmd = (cmdRaw || "").trim();
     if (!cmd) return;
 
-    // garante CRLF (o parser procura \r\n)
-    if (!cmd.endsWith("\\r\\n")) cmd += "\\r\\n";
+    // Normaliza final: remove CR/LF do fim e adiciona CRLF real (0x0D 0x0A)
+    // (o parser do firmware procura por \r\n)
+    cmd = cmd.replace(/[\r\n]+$/g, "") + "\r\n";
 
     const data = new TextEncoder().encode(cmd);
+    const cmdShown = cmd.replace(/\r\n$/,"");
+
+    // Reset: o firmware chama esp_restart() dentro do callback.
+    // Alguns navegadores podem reportar erro porque o ESP reinicia antes do ACK,
+    // mas o reset pode acontecer mesmo assim.
+    const isReset = /^AT&WR=9/i.test(cmdShown);
 
     try {
-      // writeValue => "with response" (mais compatível)
-      await sppChar.writeValue(data);
-      log(`SPP TX: ${cmd.replace(/\\r\\n$/, "")}`);
+      const p = sppChar.writeValue(data); // write with response (mais compatível)
+
+      if (isReset) {
+        log(`SPP TX (reset): ${cmdShown} (aguardando desconexão...)`);
+        setTimeout(() => { disconnect().catch(()=>{}); }, 300);
+        await p.catch((err) => log(`⚠️ Write retornou erro (reset): ${err}`));
+        return;
+      }
+
+      await p;
+      log(`SPP TX: ${cmdShown}`);
     } catch (err) {
       log(`❌ Erro ao enviar: ${err}`);
     }
@@ -258,6 +288,12 @@
       sendCommand(c);
     });
   });
+
+  // Tenta desconectar ao fechar/atualizar a página
+  window.addEventListener("beforeunload", () => {
+    try { if (device && device.gatt && device.gatt.connected) device.gatt.disconnect(); } catch (_) {}
+  });
+
 </script>
 </body>
 </html>
