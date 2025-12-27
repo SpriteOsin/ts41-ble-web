@@ -1,0 +1,633 @@
+
+  /* === (Ana) Mudei o Root === */
+  :root{
+    color-scheme: dark;
+
+    /* === FUNDO GERAL (azul escuro) === */
+    --bgA:#0e1623;
+    --bgB:#0a101a;
+
+    /* === PAINÉIS / CARDS === */
+    --panelA:#141f2e;
+    --panelB:#0f1a28;
+
+    --panel2A:#182538;
+    --panel2B:#101a28;
+
+    /* === INPUTS / CAMPOS === */
+    --field:#0d1522;
+    --field2:#0a111c;
+
+    /* === BORDAS === */
+    --border:#0a1320;
+    --border2:#070e18;
+    --hair:#24344a;
+
+    /* === TEXTO === */
+    --text:#e9f1ff;
+    --muted:#9fb0c7;
+    --muted2:#7f92ac;
+
+    /* === CORES DE AÇÃO  === */
+    --blue:#1da1ff;
+    --blue2:#0b6fbf;
+
+    --green:#2fdc7c;
+    --yellow:#ffd84a;
+    --red:#ff4d4f;
+
+    --radius: 14px;
+    --radius2: 12px;
+
+    --shadow: 0 14px 28px rgba(0,0,0,.55);
+    --inset: inset 0 1px 0 rgba(255,255,255,.06),
+            inset 0 -1px 0 rgba(0,0,0,.55);
+
+  }
+
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+
+  body{
+    margin:0;
+    padding:18px 12px 34px;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:
+      radial-gradient(900px 520px at 12% 0%, rgba(255,255,255,.10), transparent 55%),
+      linear-gradient(180deg, var(--bgA), var(--bgB));
+    color: var(--text);
+  }
+
+  .container{
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+
+  /* (Ana) Bloco da logo */
+  .appbar{
+    border-radius: var(--radius);
+    border: 1px solid rgba(29,161,255,.18);
+    background:
+      radial-gradient(600px 120px at 20% 0%, rgba(29,161,255,.18), transparent 60%),
+      linear-gradient(180deg, #121f33, #0b1422);
+    box-shadow:
+      0 14px 28px rgba(0,0,0,.55),
+      inset 0 1px 0 rgba(255,255,255,.06);
+    padding: 16px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+
+  .brand{
+    display:flex; align-items:baseline; gap:10px;
+    font-weight: 900;
+    letter-spacing: .3px;
+    font-size: 28px;
+    line-height:1;
+  }
+
+  .logo{
+    height: 52px;
+    width: auto;
+    display:block;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,.65));
+  }
+  @media (max-width: 720px){
+    .logo{ height: 40px; }
+  }
+  .brand .a{ color: #f7f7f7; text-shadow: 0 1px 0 rgba(0,0,0,.6); }
+  .brand .b{ color: var(--blue); text-shadow: 0 1px 0 rgba(0,0,0,.6); }
+  .appbar .right{
+    font-size: 12px;
+    color: var(--muted);
+    opacity:.95;
+    text-align:right;
+  }
+
+  h2{ display:none; }
+
+  .row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+
+  /* Cards / Panels */
+  .card{
+    background: linear-gradient(180deg, var(--panel2A), var(--panelB));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin-top: 12px;
+    box-shadow: var(--shadow);
+  }
+
+
+  .small{
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+
+  b{ color: #ffffff; }
+
+  code{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: #eaeaea;
+    background: linear-gradient(180deg, #2a2a2a, #1f1f1f);
+    border: 1px solid #0f0f0f;
+    padding: 2px 6px;
+    border-radius: 9px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+  }
+
+  /* Inputs & buttons: more "industrial UI" */
+  button, input, select{
+    font: inherit;
+    padding: 10px 12px;
+    border-radius: var(--radius2);
+    border: 1px solid #101010;
+    background: linear-gradient(180deg, #3b3b3b, #2a2a2a);
+    color: var(--text);
+    outline: none;
+    transition: transform .06s ease, filter .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+    box-shadow: var(--inset);
+  }
+
+  input{
+    background: linear-gradient(180deg, var(--field), var(--field2));
+    border-color: #0f0f0f;
+    box-shadow:
+      inset 0 1px 2px rgba(0,0,0,.85),
+      inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+  input::placeholder{ color: var(--muted2); }
+
+  button{ cursor:pointer; }
+  button:hover{
+    filter: brightness(1.08);
+    border-color: rgba(255,255,255,.18);
+  }
+  button:active{ transform: translateY(1px); filter: brightness(0.98); }
+
+  button:disabled, input:disabled{
+    opacity: .45;
+    cursor: not-allowed;
+    filter: grayscale(.2);
+  }
+
+  /* Primary / Danger buttons */
+  #btnConnect, #btnSend{
+    background: linear-gradient(180deg, rgba(19,163,230,.35), rgba(11,127,180,.18));
+    border-color: rgba(19,163,230,.55);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.10),
+      0 0 0 1px rgba(0,0,0,.35),
+      0 10px 18px rgba(0,0,0,.45);
+  }
+  #btnConnect:hover, #btnSend:hover{
+    border-color: rgba(19,163,230,.85);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.14),
+      0 0 0 1px rgba(0,0,0,.35),
+      0 0 18px rgba(19,163,230,.18),
+      0 10px 18px rgba(0,0,0,.45);
+  }
+
+  #btnDisconnect{
+    background: linear-gradient(180deg, rgba(255,90,106,.28), rgba(255,90,106,.10));
+    border-color: rgba(255,90,106,.55);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.10),
+      0 0 0 1px rgba(0,0,0,.35),
+      0 10px 18px rgba(0,0,0,.45);
+  }
+  #btnDisconnect:hover{
+    border-color: rgba(255,90,106,.85);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.14),
+      0 0 0 1px rgba(0,0,0,.35),
+      0 0 18px rgba(255,90,106,.18),
+      0 10px 18px rgba(0,0,0,.45);
+  }
+
+  /* Pills */
+  .pill{
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid #101010;
+    background: linear-gradient(180deg, #2f2f2f, #262626);
+    color: var(--muted);
+    font-size: 12px;
+    box-shadow: var(--inset);
+  }
+  #devName{ color: #ffffff; border-color: rgba(255,255,255,.18); }
+
+  /* =====(Ana) Mudanças no terminal ===== */
+  #log{
+    white-space: pre-wrap;
+    border: 1px solid #101010;
+    border-radius: var(--radius);
+    padding: 12px;
+    height: 50vh;
+    overflow:auto;
+    background:
+      radial-gradient(800px 240px at 30% 0%, rgba(19,163,230,.10), transparent 60%),
+      linear-gradient(180deg, #020617, #020617);
+    box-shadow:
+      inset 0 1px 2px rgba(0,0,0,.85),
+      0 10px 18px rgba(0,0,0,.45);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: #e8e8e8;
+  }
+    .title{
+    font-size: 17px;          /* letra maior */
+    font-weight: 800;         /* mais grossa */
+    color: #e5f2ff;
+  }
+  .right {
+    margin-left: 350px; /* aproxima do botão */
+    display: inline-block; /* garante que fique na mesma linha */
+  }
+
+  .terminal-hint{
+    margin-bottom: 12px; 
+    opacity: 0.75;
+  }
+  .btn-clear{
+    background: #dc2626;       
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .btn-clear:hover{
+    background: #b91c1c;
+  }
+
+  .btn-clear:active{
+    transform: scale(0.97);
+  }
+
+
+  
+/* =====(Ana)  TABS (Botoes de opção) ===== */
+  .tabs{
+    display:flex;
+    gap:8px;
+    padding:6px;
+    border-radius:14px;
+    background:#0e1623;
+    border:1px solid #1e293b;
+  }
+
+  .tabbtn{
+    background: #0a101a;
+    border: 1px solid #1e293b;
+    padding:8px 16px;
+    border-radius:12px;
+    color:#94a3b8;
+    font-size:14px;
+    cursor:pointer;
+    transition: all .2s ease;
+
+  }
+/* ===== (Ana) cor quando passa por cima ===== */
+  .tabbtn:hover{
+    background:#0a101a;
+    border-color:#38bdf8;
+    color:#ffffff;
+    box-shadow: 0 0 0 1px rgba(56,189,248,.35);
+  }
+/* ===== (Ana) cor do botão precisonado ===== */
+  .tabbtn.active{
+    background: linear-gradient(180deg, #0ea5e9, #0284c7);
+    color:#ffffff;
+    border-color:#38bdf8;
+    box-shadow: 0 0 0 1px rgba(56,189,248,.35);
+  }
+
+
+  .tabpanel{ display:none; padding-top: 2px; }
+  .tabpanel.active{ display:block; }
+
+  /* ===== (Ana) BOTÕES AT (Leituras / Ações / Scope / Modo) ===== */
+  .qc{
+    background:#0a101a;
+    border:1px solid #1e293b;
+    border-radius:12px;
+    padding:10px 16px;
+    color:#e5e7eb;
+    font-size:14px;
+    cursor:pointer;
+    transition: all .2s ease;
+  }
+
+  .qc:hover{
+    background:#0b1220;
+    border-color:#38bdf8;
+    color:#ffffff;
+    box-shadow: 0 0 0 1px rgba(56,189,248,.35);
+  }
+
+  .qc:active{
+    transform: translateY(1px);
+  }
+
+  /* Layout helpers (optional) */
+  .split{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  @media (min-width: 980px){
+    .split{
+      grid-template-columns: 1.05fr .95fr;
+      align-items:start;
+    }
+  }
+/* (Ana) Responsivo para o terminal voltar para baixo de acordo com a tela */
+  @media (max-width: 900px){
+    .main-layout{
+      grid-template-columns: 1fr;
+    }
+
+    .right-panel #log{
+      height: 45vh;
+    }
+  }
+  /*(Ana)  Mudanças no terminal */
+  .main-layout{
+    display:grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap:16px;
+    align-items: stretch;
+  }
+
+  /*(Ana)  Coluna esquerda */
+  .left-panel{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  /*(Ana)  Coluna direita (terminal) */
+  .right-panel{
+    display:flex;
+    flex-direction:column;
+  }
+
+  /*(Ana)  Terminal ocupa toda a altura disponível */
+  .right-panel #log{
+    height: 100%;
+    min-height: 420px;
+  }
+   /*(Ana)  titulo dos blocos de conexao e comandos */
+  .card-title{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    font-size: 17px;          /* letra maior */
+    font-weight: 800;         /* mais grossa */
+    color: #e5f2ff;
+
+    margin-bottom: 18px;      /* afastar dos botões */
+    padding-bottom: 10px;
+
+    border-bottom: 1px solid rgba(56,189,248,0.35);
+    letter-spacing: 0.4px;
+  }
+
+  .icon-bt{
+    width: 22px;
+    height: 22px;
+    fill: #38bdf8; /* azul */
+    flex-shrink: 0;
+  }
+
+  .icon-terminal{
+    width: 18px;
+    height: 18px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2338bdf8'%3E%3Cpath stroke-width='2' d='M4 5h16M4 19h16M6 9l4 4-4 4m6 0h6'/%3E%3C/svg%3E") no-repeat center;
+    background-size: contain;
+  }
+
+  /*(Ana)  TEMA CLARO */
+  .header-content{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .theme-toggle{
+    background: transparent;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 8px 10px;
+    cursor: pointer;
+    color: #e5e7eb;
+    transition: all .2s ease;
+  }
+
+  .theme-toggle:hover{
+    border-color: #38bdf8;
+    color: #38bdf8;
+  }
+
+
+  body.light-theme{
+    background:#f8fafc;
+    color:#0f172a;
+  }
+
+  /* ====CARDS======== */
+  body.light-theme .card{
+    background:#ffffff;
+    border:1px solid #e2e8f0;
+  }
+
+  /* =====TEXTOS======== */
+
+  /* Texto geral */
+  body.light-theme,
+  body.light-theme p,
+  body.light-theme span,
+  body.light-theme div{
+    color:#0f172a;
+  }
+
+  /* Títulos (igual aos outros títulos do layout) */
+  body.light-theme .card b,
+  body.light-theme .title,
+  body.light-theme .section-title{
+    color:#0f172a;   
+    font-weight:700;
+  }
+
+  /* Textos pequenos */
+  body.light-theme .small{
+    color:#0f172a;
+  }
+
+  /* Placeholder */
+  body.light-theme input::placeholder{
+    color:#64748b;
+  }
+
+  /* ==BOTÕES== */
+  body.light-theme button{
+    background:#f1f5f9;
+    color:#0f172a;
+    border:1px solid #cbd5e1;
+  }
+
+  body.light-theme button:hover{
+    background:#e2e8f0;
+  }
+
+  /* Botão limpar (vermelho) */
+  body.light-theme .btn-clear{
+    background:#fee2e2;
+    color:#b91c1c;
+    border:1px solid #fecaca;
+  }
+
+  body.light-theme .btn-clear:hover{
+    background:#fecaca;
+  }
+
+  /* ====TABS===== */
+  body.light-theme .tabs{
+    background:#e2e8f0;
+    border:1px solid #cbd5e1;
+  }
+
+  body.light-theme .tabbtn{
+    color:#334155;
+  }
+
+  body.light-theme .tabbtn.active{
+    background:linear-gradient(180deg,#38bdf8,#0ea5e9);
+    color:#ffffff;
+  }
+
+  /* ====BOTÕES AT==== */
+  body.light-theme .qc{
+    background:#f8fafc;
+    color:#0f172a;
+    border:1px solid #cbd5e1;
+  }
+
+  body.light-theme .qc:hover{
+    background:#e2e8f0;
+    border-color:#38bdf8;
+  }
+
+  /* ====TERMINAL====== */
+  body.light-theme .terminal{
+    background:#ffffff;
+  }
+
+  body.light-theme #log{
+      background:
+        radial-gradient(800px 240px at 30% 0%, rgba(19,163,230,.10), transparent 60%),
+        linear-gradient(180deg, #e2e8f0, #e2e8f0);
+    color:#020617;
+    border:1px solid #e2e8f0;
+  }
+
+  /* =====PILLS / STATUS====== */
+  body.light-theme .pill{
+    background:#e2e8f0;
+    color:#0f172a;
+    border:1px solid #cbd5e1;
+  }
+
+  /*=====LOGO===== */
+
+  body.light-theme .appbar{
+    border-radius: var(--radius);
+    border: 2px solid #38bdf8; 
+    background: linear-gradient(
+      180deg,
+      #f1f5f9,
+      #e2e8f0,
+      #cbd5e1
+    );
+
+    box-shadow:
+      0 8px 18px rgba(15,23,42,.15),
+      inset 0 1px 0 rgba(255,255,255,.75);
+
+    padding: 16px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+
+  /* Texto da logo */
+  body.light-theme .appbar h1,
+  body.light-theme .appbar span{
+    color:#0f172a;
+  }
+  /*BOTÕES DE AÇÃO  */
+  body.light-theme #btnSend{
+    background: linear-gradient(180deg, #38bdf8, #38bdf8);
+    color: #ffffff;
+    border: 1px solid #1da1ff;
+    font-weight: 600;
+    box-shadow: 0 6px 14px rgba(37,99,235,.35);
+  }
+
+  body.light-theme #btnConnect:hover,
+  body.light-theme #btnSend:hover{
+    background: linear-gradient(180deg, #38bdf8, #38bdf8);
+  }
+
+  /* DESCONECTAR */
+  body.light-theme #btnDisconnect{
+    background: linear-gradient(180deg, #f87171, #ef4444);
+    color: #ffffff;
+    border: 1px solid #dc2626;
+    font-weight: 600;
+    box-shadow: 0 6px 14px rgba(239,68,68,.35);
+  }
+
+  body.light-theme #btnDisconnect:hover{
+    background: linear-gradient(180deg, #ef4444, #dc2626);
+  }
+
+  /* LIMPAR TERMINAL */
+  body.light-theme .btn-clear{
+    background: linear-gradient(180deg, #fb7185, #f43f5e);
+    color: #ffffff;
+    border: 1px solid #e11d48;
+    font-weight: 600;
+    box-shadow: 0 6px 14px rgba(244,63,94,.35);
+  }
+
+  body.light-theme .btn-clear:hover{
+    background: linear-gradient(180deg, #f43f5e, #e11d48);
+  }
+  /*  Comando */
+  body.light-theme #cmd{
+    background: #f8fafc;        /* fundo claro */
+    color: #0f172a;             /* texto escuro */
+    border: 1px solid #38bdf8;  /* borda visível */
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+
